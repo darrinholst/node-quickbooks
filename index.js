@@ -2415,13 +2415,13 @@ module.query = function(context, entity, criteria) {
       var fields = Object.keys(data.QueryResponse)
       var key = _.find(fields, function(k) { return k.toLowerCase() === entity.toLowerCase()})
       if (fetchAll) {
-        if (data && data.QueryResponse && data.QueryResponse.maxResults === limit) {
+        if (data && data.QueryResponse && data.QueryResponse.maxResults >= limit) {
           if (_.isArray(criteria)) {
             _.each(criteria, function(e) {
-              if (e.field === 'offset') e.value = e.value + limit
+              if (e.field === 'offset') e.value = e.value + data.QueryResponse.maxResults
             })
           } else if (_.isObject(criteria)) {
-            criteria.offset = criteria.offset + limit
+            criteria.offset = criteria.offset + data.QueryResponse.maxResults
           }
           return module.query(context, entity, criteria).then(function(more) {
             data.QueryResponse[key] = data.QueryResponse[key].concat(more.QueryResponse[key] || [])
